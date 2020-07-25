@@ -1,0 +1,4 @@
+-------------------------------------------------------------------------------
+Test set: jp.ac.tsukuba.cs.ialab.lr.AppTest
+-------------------------------------------------------------------------------
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.095 s - in jp.ac.tsukuba.cs.ialab.lr.AppTest
