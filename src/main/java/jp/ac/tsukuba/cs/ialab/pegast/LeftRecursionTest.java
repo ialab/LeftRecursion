@@ -50,6 +50,40 @@ public class LeftRecursionTest {
     }
     public static void main( String[] args )
     {   
+        Grammar javaPrimary = (new Grammar())
+        .addRule(nt("Primary"),nt("PrimaryNoNewArray"))
+        .addRule(nt("PrimaryNoNewArray"),
+            choice(nt("ClassInstanceCreationExpression"),
+                nt("MethodInvocation"),
+                nt("FieldAccess"),
+                nt("ArrayAccess"),
+                constant("this")))
+        .addRule(nt("ClassInstanceCreationExpression"),
+            choice(seq(constant("new "),nt("ClassOrInterfaceType"), constant("()")),
+                        seq(nt("Primary"), constant(".new "), nt("Identifier"), constant("()") )))
+        .addRule(nt("MethodInvocation"),
+            choice(seq(nt("Primary"), constant("."), nt("Identifier"), constant("()")),
+                seq(nt("MethodName"), constant("()"))))
+        .addRule(nt("FieldAccess"),
+            choice(seq(nt("Primary"), constant("."), nt("Identifier")),
+                seq(constant("super."), nt("Identifier"))))
+        .addRule(nt("ArrayAccess"),
+            choice(seq(nt("Primary"), constant("["), nt("Expression"), constant("]") ),
+                seq(nt("ExpressionName"), constant("["), nt("Expression"), constant("]"))))
+        .addRule(nt("ClassOrInterfaceType"),
+            choice(nt("ClassName"), nt("InterfaceTypeName")))
+        .addRule(nt("ClassName"),
+            choice(constant("C"), constant("D") ))
+        .addRule(nt("InterfaceTypeName"),
+            choice(constant("I"), constant("J") ))
+        .addRule(nt("Identifier"),
+            choice(constant("x"), constant("y"), nt("ClassOrInterfaceType")))
+        .addRule(nt("MethodName"),
+            choice(constant("m"), constant("n") ))
+        .addRule(nt("ExpressionName"),nt("Identifier") )
+        .addRule(nt("Expression"),
+            choice(constant("i"), constant("j") ))
+        .setStart(nt("Primary"));
         TestData[] data = {
             new TestData("基本的な右再帰",
                 (new Grammar())
@@ -116,7 +150,11 @@ public class LeftRecursionTest {
                                           seq(nt("A"), constant("a"))))
                 .setStart(nt("S")),
                 "bab-bab"),
-
+                // Java Primary
+                new TestData("Javaプライマリ文法にthisを与える", javaPrimary, "this"),
+                new TestData("Javaプライマリ文法にthis.x.yを与える", javaPrimary, "this.x.y"),
+                new TestData("Javaプライマリ文法にthis.x.m()を与える", javaPrimary, "this.x.m()"),
+                new TestData("Javaプライマリ文法にx[i][j].yを与える", javaPrimary, "x[i][j].y"),
             };
         final Map<String,ParserFactory> map = new HashMap<String,ParserFactory>();
         map.put("umeda", new ParserFactory() {
